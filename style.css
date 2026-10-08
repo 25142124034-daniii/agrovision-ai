@@ -1,0 +1,177 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 100%);
+  color: #f8fafc;
+  min-height: 100vh;
+  padding: 15px;
+}
+
+.app-layout {
+  display: flex;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.glass-card {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.brand h2 { color: #10b981; font-weight: 800; font-size: 1.5rem; }
+.brand span { color: #64748b; font-size: 0.75rem; letter-spacing: 1px; }
+.divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 15px 0; }
+
+.sidebar-section label { display: block; font-size: 0.85rem; color: #94a3b8; margin: 10px 0 4px 0; }
+.custom-select, .custom-input, .custom-slider {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.main-content { flex-grow: 1; min-width: 0; }
+
+.tab-navigation {
+  display: flex;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: 0.3s;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.title-modul { font-size: 1.4rem; margin-bottom: 4px; }
+.subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px; }
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.metric-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.metric-label { font-size: 0.8rem; color: #94a3b8; }
+.metric-value { font-size: 1.5rem; font-weight: 800; margin-top: 4px; }
+
+.text-green { color: #10b981; }
+.text-blue { color: #38bdf8; }
+.text-red { color: #ef4444; }
+.text-yellow { color: #f59e0b; }
+.text-purple { color: #a855f7; }
+
+.grid-2col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.grid-3col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.suitability-pass {
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.8) 0%, rgba(20, 83, 45, 0.8) 100%);
+  border: 1px solid #10b981;
+  color: #6ee7b7;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.suitability-fail {
+  background: linear-gradient(135deg, rgba(127, 29, 29, 0.8) 0%, rgba(153, 27, 27, 0.8) 100%);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.info-badge {
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid #38bdf8;
+  color: #38bdf8;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: #10b981;
+  color: #0f172a;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.custom-table { width: 100%; border-collapse: collapse; text-align: left; }
+.custom-table th, .custom-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.9rem; }
+.custom-table th { color: #38bdf8; }
+
+code {
+  color: #38bdf8 !important;
+  background-color: rgba(15, 23, 42, 0.8) !important;
+  padding: 2px 6px !important;
+  border-radius: 6px !important;
+}
+
+@media (max-width: 768px) {
+  .app-layout { flex-direction: column; }
+  .sidebar { width: 100%; }
+}

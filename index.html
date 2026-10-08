@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgroVision AI Precision System v3.0</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- SIDEBAR GLOBAL CONTROLLER -->
+    <aside class="sidebar glass-card">
+      <div class="brand">
+        <h2>🌾 AgroVision AI</h2>
+        <span>PRECISION SYSTEM v3.0</span>
+      </div>
+      <hr class="divider">
+
+      <div class="sidebar-section">
+        <h3>⚙️ Target Komoditas Indonesia</h3>
+        
+        <label for="select-kategori">Pilih Kategori Komoditas:</label>
+        <select id="select-kategori" class="custom-select" onchange="updateCommodityList()">
+          <option value="Hortikultura" selected>Hortikultura</option>
+          <option value="Tanaman Pangan">Tanaman Pangan</option>
+          <option value="Perkebunan">Perkebunan</option>
+          <option value="Rempah-Rempah">Rempah-Rempah</option>
+        </select>
+
+        <label for="select-komoditas">Pilih Tanaman Target:</label>
+        <select id="select-komoditas" class="custom-select" onchange="onCommodityChange()"></select>
+
+        <div class="info-box glass-card" style="margin-top:15px;">
+          <p id="info-siklus"><b>Siklus Tanam:</b> -</p>
+          <p id="info-hasil" style="margin-top:5px;"><b>Estimasi Hasil:</b> -</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <div class="tab-navigation">
+        <button class="tab-btn active" onclick="openTab(event, 'tab-a')">📡 Modul A: Kelayakan Lahan</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-b')">🍃 Modul B: Diagnosa Penyakit</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-c')">💧 Modul C: Irigasi FAO</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-d')">📊 Modul D: Database Komoditas</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-e')">📁 Open Datasets</button>
+      </div>
+
+      <!-- TAB MODUL A -->
+      <div id="tab-a" class="tab-content active">
+        <h2 class="title-modul">📡 Modul A: Analisis Spasial & Kelayakan Lahan (<span class="crop-name-display">Bawang Merah</span>)</h2>
+        <p class="subtitle">Gunakan peta interaktif di bawah untuk menggambar polygon atau menandai area lahan pertanian.</p>
+
+        <div id="map" class="glass-card" style="height: 420px; width: 100%; margin-bottom: 15px; border-radius: 12px; z-index: 1;"></div>
+
+        <div class="custom-card" style="padding: 12px 20px; margin-bottom: 15px;">
+          <span><b>🌾 GIS Engine v3.0</b></span> | Target Komoditas: <span style="color:#38bdf8;"><b class="crop-name-display">Bawang Merah</b></span> (<span id="gis-kategori">Hortikultura</span>) | 
+          <b>Luas Lahan:</b> <span style="color:#10b981;" id="gis-luas">0.0 ha</span> | 
+          <b>📍 Koordinat:</b> <span style="color:#f59e0b;" id="gis-koordinat">-7.4965° S, 112.6316° E</span>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric-card"><div class="metric-label">NDVI (Vegetasi)</div><div class="metric-value text-green" id="val-ndvi">0.72</div></div>
+          <div class="metric-card"><div class="metric-label">NDWI (Kandungan Air)</div><div class="metric-value text-blue" id="val-ndwi">0.38</div></div>
+          <div class="metric-card"><div class="metric-label">NDBI (Bangunan)</div><div class="metric-value text-red" id="val-ndbi">-0.42</div></div>
+          <div class="metric-card"><div class="metric-label">pH Tanah Lahan</div><div class="metric-value text-yellow" id="val-ph">6.2</div></div>
+        </div>
+
+        <hr class="divider">
+        <h3>🧪 Evaluasi Kesesuaian Lahan untuk <span class="crop-name-display">Bawang Merah</span></h3>
+        
+        <div class="grid-3col" style="margin-top: 15px;">
+          <div id="status-lahan-box" class="suitability-pass">
+            STATUS LAHAN:<br><span style="font-size:1.1rem;" id="status-lahan-title">✅ SANGAT LAYAK UNTUK BAWANG MERAH</span>
+            <p id="status-lahan-desc" style="font-size:0.8rem; font-weight:normal; margin-top:8px; opacity:0.9;">Kondisi pH dan indeks vegetasi memenuhi kriteria tumbuh optimal.</p>
+          </div>
+
+          <div class="glass-card">
+            <h4>📊 Parameter Ideal <span class="crop-name-display">Bawang Merah</span>:</h4>
+            <ul style="line-height:1.8; font-size:0.85rem; margin-top:8px; color:#cbd5e1;">
+              <li>• Rentang pH Optimal: <b id="ideal-ph">5.6 - 6.5</b></li>
+              <li>• Kebutuhan Air: <b id="ideal-water">Medium</b></li>
+              <li>• Siklus Tanam: <b id="ideal-cycle">60-70 Hari</b></li>
+            </ul>
+          </div>
+
+          <div class="glass-card">
+            <h4>🌱 Estimasi Hasil Panen:</h4>
+            <div class="info-badge" style="margin-top:10px;" id="ideal-yield">Target Produksi: 10.0 - 14.0 Ton/Ha</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB MODUL B -->
+      <div id="tab-b" class="tab-content">
+        <h2 class="title-modul">🍃 Modul B: Diagnosa Penyakit & Hama Daun (<span class="crop-name-display">Bawang Merah</span>)</h2>
+        <p class="subtitle">Gunakan kamera atau unggah foto sampel daun tanaman <span class="crop-name-display">Bawang Merah</span> untuk mendiagnosa potensi penyakit secara spesifik.</p>
+
+        <div class="grid-2col">
+          <div class="glass-card">
+            <h3>📷 Input Foto Sampel Daun</h3>
+            
+            <div style="margin: 15px 0; display: flex; gap: 10px;">
+              <button id="btn-mode-cam" class="tab-btn active" style="flex:1;" onclick="switchCameraMode('webcam')">📷 Gunakan Kamera</button>
+              <button id="btn-mode-file" class="tab-btn" style="flex:1;" onclick="switchCameraMode('file')">📁 Upload File Foto</button>
+            </div>
+
+            <!-- STREAM KAMERA -->
+            <div id="webcam-container" style="text-align:center;">
+              <video id="webcam-video" autoplay playsinline style="width:100%; max-height:240px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:#000; object-fit:cover;"></video>
+              <button class="btn-primary" onclick="captureWebcam()" style="margin-top:10px; background:#38bdf8; color:#0f172a;">📸 Ambil Foto Daun</button>
+            </div>
+
+            <!-- FILE UPLOAD CONTAINER -->
+            <div id="file-container" style="display:none; margin: 15px 0;">
+              <input type="file" id="leaf-uploader" accept="image/*" class="custom-input" onchange="handleImageUpload(event)">
+            </div>
+
+            <!-- CANVAS & PREVIEW -->
+            <canvas id="webcam-canvas" style="display:none;"></canvas>
+            <div style="text-align:center; margin-top:15px;">
+              <img id="leaf-preview" src="" alt="Hasil Tangkapan Daun" style="display:none; max-width:100%; max-height:220px; border-radius:10px; border:2px solid #10b981; margin-bottom:10px;">
+            </div>
+
+            <button class="btn-primary" onclick="runVisionAI()" style="margin-top:10px;">🔍 Jalankan Analisis Computer Vision</button>
+          </div>
+
+          <div class="glass-card">
+            <h3>🔬 Hasil Analisis Computer Vision (<span class="crop-name-display">Bawang Merah</span>)</h3>
+            <div id="vision-result-container" style="margin-top: 15px;">
+              <p style="color: #94a3b8;">Ambil foto menggunakan kamera atau unggah file, lalu klik "Jalankan Analisis Computer Vision" untuk melihat diagnosis AI lengkap.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB MODUL C -->
+      <div id="tab-c" class="tab-content">
+        <h2 class="title-modul">💧 Modul C: Kalkulator Irigasi Presisi FAO-56 (<span class="crop-name-display">Bawang Merah</span>)</h2>
+        <p class="subtitle">Kalkulasi Kebutuhan Air Tanaman (ETc) dan Rekomendasi Penyiraman Presisi berbasis Mikroklimat.</p>
+
+        <div class="grid-2col">
+          <div class="glass-card">
+            <h3>⛅ Parameter Mikroklimat Lahan</h3>
+            
+            <label>Suhu Udara (°C): <b id="val-temp-lbl">29.5</b></label>
+            <input type="range" id="slider-temp" min="15" max="42" value="29.5" step="0.5" class="custom-slider" oninput="calculateFAO56()">
+
+            <label>Kelembapan Relatif / RH (%): <b id="val-rh-lbl">65</b></label>
+            <input type="range" id="slider-rh" min="20" max="95" value="65" step="1" class="custom-slider" oninput="calculateFAO56()">
+
+            <label>Kecepatan Angin (m/s pada 2m): <b id="val-wind-lbl">2.1</b></label>
+            <input type="range" id="slider-wind" min="0.5" max="10" value="2.1" step="0.1" class="custom-slider" oninput="calculateFAO56()">
+
+            <label>Penyinaran Matahari (Jam/Hari): <b id="val-sun-lbl">8.5</b></label>
+            <input type="range" id="slider-sun" min="2" max="12" value="8.5" step="0.5" class="custom-slider" oninput="calculateFAO56()">
+
+            <label>Curah Hujan Efektif (mm/hari):</label>
+            <input type="number" id="input-rain" value="1.2" step="0.1" class="custom-input" oninput="calculateFAO56()">
+
+            <hr class="divider">
+            <h3>🌱 Parameter Tanaman & Sistem Irigasi</h3>
+            
+            <label>Fase Pertumbuhan Tanaman:</label>
+            <select id="select-stage" class="custom-select" onchange="calculateFAO56()">
+              <option value="kc_init">Fase Awal (Initial)</option>
+              <option value="kc_mid" selected>Fase Vegetatif / Pembentukan (Mid-Season)</option>
+              <option value="kc_end">Fase Akhir / Pematangan (Late-Season)</option>
+            </select>
+
+            <label style="margin-top:10px;">Luas Lahan (m²):</label>
+            <input type="number" id="input-area" value="1000" class="custom-input" oninput="calculateFAO56()">
+
+            <label style="margin-top:10px;">Efisiensi Irigasi (%): <b id="val-eff-lbl">85</b></label>
+            <input type="range" id="slider-eff" min="50" max="95" value="85" step="1" class="custom-slider" oninput="calculateFAO56()">
+          </div>
+
+          <div>
+            <div class="metric-grid">
+              <div class="metric-card"><div class="metric-label">Evapotranspirasi Acuan (ET₀)</div><div class="metric-value text-blue" id="res-eto">4.12 mm/hari</div></div>
+              <div class="metric-card"><div class="metric-label">Koefisien Kc (<span class="crop-name-display">Bawang</span>)</div><div class="metric-value text-yellow" id="res-kc">1.05</div></div>
+              <div class="metric-card"><div class="metric-label">Kebutuhan Air (ETc)</div><div class="metric-value text-green" id="res-etc">3.13 mm/hari</div></div>
+              <div class="metric-card"><div class="metric-label">Total Volume Irigasi</div><div class="metric-value text-purple" id="res-vol">3.68 m³/hari</div></div>
+            </div>
+
+            <div class="glass-card" style="margin-top:15px;">
+              <h4 style="color:#38bdf8;">📋 Jadwal Penyiraman untuk <span class="crop-name-display">Bawang Merah</span>:</h4>
+              <ul style="line-height:1.8; margin-top:10px; color:#cbd5e1; font-size:0.9rem;">
+                <li><b>Dosis Kebutuhan Air:</b> <code id="rec-dosis">3.68 Liter / m² / hari</code></li>
+                <li><b>Total Volume Lahan (<span id="rec-luas">1000</span> m²):</b> <code id="rec-total-liters">3682 Liter/hari</code> (<span id="rec-total-m3">3.68</span> m³/hari)</li>
+                <li><b>Waktu Pompa (50 L/menit):</b> <code id="rec-waktu">73.6 Menit/hari</code></li>
+                <li><b>Sesi Penyiraman:</b> Bagi menjadi 2 sesi (Pagi: 06.00 WIB & Sore: 16.00 WIB).</li>
+              </ul>
+            </div>
+
+            <div class="glass-card" style="margin-top:15px; border-left:4px solid #10b981;">
+              <h5 style="color:#10b981; margin-bottom:5px;">💡 Catatan Karakteristik:</h5>
+              <p style="font-size:0.85rem; color:#94a3b8;">
+                <b>Kebutuhan Air:</b> <span id="notes-water">Medium</span><br>
+                <b>Estimasi Hasil:</b> <span id="notes-yield">10.0 - 14.0 Ton/Ha</span><br>
+                <b>Siklus Tanam:</b> <span id="notes-cycle">60-70 Hari</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB MODUL D -->
+      <div id="tab-d" class="tab-content">
+        <h2 class="title-modul">📊 Modul D: Database Komoditas Pertanian Indonesia</h2>
+        <div class="glass-card" style="overflow-x:auto;">
+          <table class="custom-table" id="crop-table">
+            <thead>
+              <tr>
+                <th>Nama Komoditas</th>
+                <th>Kategori</th>
+                <th>pH Minimum</th>
+                <th>pH Maksimum</th>
+                <th>Kebutuhan Air</th>
+                <th>Siklus Tanam</th>
+                <th>Estimasi Hasil</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB TAB OPEN DATASETS -->
+      <div id="tab-e" class="tab-content">
+        <h2 class="title-modul">📚 Repository Dataset Penyakit Tanaman</h2>
+        <hr class="divider">
+        <div class="grid-2col">
+          <div class="glass-card">
+            <h3 style="color:#38bdf8;">1. PlantVillage Dataset</h3>
+            <ul style="line-height:1.8; margin-top:10px; color:#cbd5e1; font-size:0.9rem;">
+              <li><b>Ukuran:</b> &gt; 54.000 foto daun.</li>
+              <li><b>Cakupan:</b> 38 kelas penyakit pada 14 komoditas.</li>
+              <li><b>Link Repo:</b> <code>github.com/spMohanty/PlantVillage-Dataset</code></li>
+            </ul>
+          </div>
+
+          <div class="glass-card">
+            <h3 style="color:#38bdf8;">2. PlantDoc Open Dataset</h3>
+            <ul style="line-height:1.8; margin-top:10px; color:#cbd5e1; font-size:0.9rem;">
+              <li><b>Ukuran:</b> &gt; 2.500 foto kondisi lapangan asli.</li>
+              <li><b>Cakupan:</b> 13 spesies tanaman & 27 kelas penyakit.</li>
+              <li><b>Link Repo:</b> <code>github.com/pratikkayal/PlantDoc-Dataset</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
