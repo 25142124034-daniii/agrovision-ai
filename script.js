@@ -164,21 +164,44 @@ function evaluasiKesesuaianLahan(isSettlement = false, ph = 6.2, ndvi = 0.72) {
   }
 }
 
-// MODUL B: WEBCAM CAMERA REALTIME & ERROR HANDLING
+// ==============================================================================
+// MODUL B: WEBCAM CAMERA REALTIME & SWITCH FACING MODE
+// ==============================================================================
+let currentFacingMode = "environment"; // "environment" = Kamera Belakang HP, "user" = Kamera Depan HP
+
+// Start Webcam dengan dukungan Kamera Depan/Belakang
 function startWebcam() {
   const video = document.getElementById("webcam-video");
   if (!video) return;
 
+  // Hentikan stream kamera aktif sebelum membuka kamera baru
+  stopWebcam();
+
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true })
+    // Mencoba membuka kamera sesuai facingMode (Kamera Belakang/Depan)
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } })
       .then(function (stream) {
         webcamStream = stream;
         video.srcObject = stream;
       })
       .catch(function (err) {
-        console.log("Kamera tidak diizinkan atau dibuka tanpa HTTP/HTTPS localhost:", err);
+        console.log("Mencoba fallback mode kamera standar:", err);
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(function (stream) {
+            webcamStream = stream;
+            video.srcObject = stream;
+          })
+          .catch(function (e) {
+            console.log("Kamera tidak diizinkan atau tidak ditemukan:", e);
+          });
       });
   }
+}
+
+// Fungsi Balik Kamera Depan / Belakang
+function switchCameraFacing() {
+  currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+  startWebcam();
 }
 
 function stopWebcam() {

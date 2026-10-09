@@ -114,10 +114,14 @@
             </div>
 
             <!-- STREAM KAMERA -->
-            <div id="webcam-container" style="text-align:center;">
-              <video id="webcam-video" autoplay playsinline style="width:100%; max-height:240px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:#000; object-fit:cover;"></video>
-              <button class="btn-primary" onclick="captureWebcam()" style="margin-top:10px; background:#38bdf8; color:#0f172a;">📸 Ambil Foto Daun</button>
-            </div>
+<div id="webcam-container" style="text-align:center;">
+  <video id="webcam-video" autoplay playsinline style="width:100%; max-height:240px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:#000; object-fit:cover;"></video>
+  
+  <div style="display:flex; gap:10px; margin-top:10px;">
+    <button class="btn-primary" onclick="captureWebcam()" style="flex:2; background:#38bdf8; color:#0f172a;">📸 Ambil Foto Daun</button>
+    <button class="btn-primary" onclick="switchCameraFacing()" style="flex:1; background:#f59e0b; color:#0f172a;">🔄 Balik Kamera</button>
+  </div>
+</div>
 
             <!-- FILE UPLOAD CONTAINER -->
             <div id="file-container" style="display:none; margin: 15px 0;">
